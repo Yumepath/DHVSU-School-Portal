@@ -11,7 +11,6 @@ A **static** DHVSU Portal built using the **Ionic Framework** as a standalone **
 ## Technologies Used
 - **Frontend:** Angular, Ionic Framework
 - **Styling:** CSS / SCSS
-- **Deployment:** Static hosting platforms (e.g., GitHub Pages, Firebase Hosting)
 
 ## Getting Started
 
@@ -26,4 +25,4 @@ Ensure you have the following installed:
    git clone https://github.com/yourusername/dhvsu-portal.git
    cd dhvsu-portal
 
-  This project is made by Christian Lao Bautista. Feel free to modify and use it for educational purposes.
+  **This project is made by Christian Lao Bautista. Feel free to modify and use it for educational purposes.**
