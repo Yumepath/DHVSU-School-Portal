@@ -1,0 +1,141 @@
+/* General Styling */
+.subjects-container {
+  padding: 1rem;
+  background: linear-gradient(to bottom, #fff, #f4f4f4);
+}
+
+/* Animated Heading */
+.animated-heading {
+  text-align: center;
+  margin-bottom: 20px;
+  animation: fadeInDown 0.8s ease-in-out;
+}
+
+.animated-heading h2 {
+  font-size: 24px;
+  color: #d32f2f;
+  font-weight: bold;
+}
+
+.animated-heading p {
+  font-size: 16px;
+  color: #666;
+}
+
+/* Semester Selector */
+ion-item {
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+}
+
+ion-item:hover {
+  transform: scale(1.02);
+}
+
+/* Subject Cards */
+.subject-card {
+  border-radius: 10px;
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  cursor: pointer;
+  background: #fff;
+  animation: fadeInUp 0.5s ease-in-out;
+}
+
+.subject-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+.subject-icon {
+  font-size: 32px;
+  color: #d32f2f;
+}
+
+ion-card-title {
+  font-weight: bold;
+  font-size: 18px;
+  color: #333;
+}
+
+/* View Subject Button */
+ion-button {
+  transition: transform 0.3s ease-in-out;
+}
+
+ion-button:hover {
+  transform: scale(1.05);
+}
+
+/* Download Buttons */
+.download-container {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.download-container ion-button {
+  width: 90%;
+  margin: 10px auto;
+  font-weight: bold;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out;
+}
+
+.download-container ion-button:hover {
+  transform: scale(1.1);
+}
+
+/* Modal */
+ion-modal {
+  --background: transparent; /* Removes default background */
+  --backdrop-opacity: 0.3; /* Adjusts the dark overlay */
+  align-items: center;
+  justify-content: center;
+}
+ion-modal::part(backdrop) {
+  background: rgba(0, 0, 0, 0.5);
+  pointer-events: auto; /* Ensure interactions with modal */
+}
+.custom-modal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto; /* Ensure modal is clickable */
+}
+
+.modal-content {
+  position: relative;
+  width: 90%;
+  max-width: 500px;
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+  animation: fadeIn 0.3s ease-in-out;
+  z-index: 9999; /* Make sure it appears above the backdrop */
+}
+
+/* Status Badge */
+.regular {
+  color: #4caf50;
+  font-weight: bold;
+}
+
+/* Keyframe Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}

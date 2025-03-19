@@ -1,0 +1,79 @@
+<ion-header>
+  <ion-toolbar color="danger">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/dashboard"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Subjects Enrolled</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="subjects-container">
+  <!-- Semester Selector -->
+  <ion-item>
+    <ion-label>Semester</ion-label>
+    <ion-select [(ngModel)]="selectedSemester" (ionChange)="changeSemester($event)">
+      <ion-select-option value="2024-2025 1st Semester">2024-2025 1st Semester</ion-select-option>
+      <ion-select-option value="2024-2025 2nd Semester">2024-2025 2nd Semester</ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <div class="animated-heading">
+    <h2>Your Subjects</h2>
+    <p>Select a subject to view details</p>
+  </div>
+
+  <ion-grid>
+    <ion-row>
+      <ion-col size="12" size-md="6" size-lg="4" *ngFor="let subject of subjects">
+        <ion-card class="subject-card animate-card">
+          <ion-card-header>
+            <ion-icon [name]="subject.icon" class="subject-icon"></ion-icon>
+            <ion-card-title>{{ subject.name }}</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <p>{{ subject.description }}</p>
+            <ion-button expand="full" color="primary" (click)="viewSubject(subject)">
+              View Subject
+            </ion-button>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <!-- MODAL -->
+  <ion-modal [isOpen]="isModalOpen" (didDismiss)="closeModal()">
+    <ion-content class="modal-content">
+      <ion-card *ngIf="selectedSubject" class="fadeIn">
+        <ion-card-header>
+          <ion-card-title>{{ selectedSubject.name }}</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <p><strong>Description:</strong> {{ selectedSubject.description }}</p>
+          <p><strong>Section:</strong> {{ selectedSubject.section }}</p>
+          <p><strong>Teacher:</strong> {{ selectedSubject.teacher }}</p>
+          <p><strong>Credit Unit:</strong> {{ selectedSubject.credit }}</p>
+          <p><strong>Status:</strong> 
+            <span [ngClass]="{ 'regular': selectedSubject.status === 'Regular Load' }">
+              {{ selectedSubject.status }}
+            </span>
+          </p>
+          <ion-button expand="full" color="danger" (click)="closeModal()">Close</ion-button>
+        </ion-card-content>
+      </ion-card>
+    </ion-content>
+  </ion-modal>
+
+  <!-- Download Buttons -->
+  <div class="download-container">
+    <ion-button expand="full" color="success" (click)="downloadCertificate()">
+      <ion-icon name="download-outline"></ion-icon>
+      Download Certificate of Registration
+    </ion-button>
+    
+    <ion-button expand="full" color="tertiary" (click)="downloadActualLoad()">
+      <ion-icon name="document-outline"></ion-icon>
+      Download Actual Load
+    </ion-button>
+  </div>
+</ion-content>

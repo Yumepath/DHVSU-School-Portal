@@ -1,0 +1,191 @@
+<ion-menu side="start" content-id="main-content">
+  <ion-header>
+    <ion-toolbar color="danger">
+      <!-- Replaced Title with Image -->
+      <ion-title>
+        <img src="assets/getThemePhoto.png" alt="School Logo" style="height: 40px;">
+      </ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content>
+    <ion-list>
+      <ion-item button routerLink="/dashboard">
+        <ion-icon src="https://cdn.jsdelivr.net/npm/ionicons@5.5.2/dist/svg/grid-outline.svg" size="large"></ion-icon>
+        <ion-label>Dashboard</ion-label>
+      </ion-item>
+      <ion-item button routerLink="/calendar">
+        <ion-icon src="https://cdn.jsdelivr.net/npm/ionicons@5.5.2/dist/svg/calendar-outline.svg" size="large"></ion-icon>
+        <ion-label>Calendar</ion-label>
+      </ion-item>
+
+      <!-- Student Dropdown -->
+      <ion-item button (click)="toggleStudentDropdown()">
+        <ion-icon src="https://cdn.jsdelivr.net/npm/ionicons@5.5.2/dist/svg/person-outline.svg" size="large"></ion-icon>
+        <ion-label>Student</ion-label>
+        <ion-icon [src]="studentDropdownOpen ? 'https://cdn.jsdelivr.net/npm/ionicons@5.5.2/dist/svg/caret-up-outline.svg' : 'https://cdn.jsdelivr.net/npm/ionicons@5.5.2/dist/svg/caret-down-outline.svg'"></ion-icon>
+      </ion-item>
+
+      <div *ngIf="studentDropdownOpen">
+        <ion-item button (click)="goToSubjects()">
+          <ion-icon 
+            src="https://cdn.jsdelivr.net/npm/ionicons@5.5.2/dist/svg/book-outline.svg" 
+            size="large">
+          </ion-icon>
+          <ion-label>Subjects Enrolled</ion-label>
+        </ion-item>        
+        
+        <ion-item button (click)="goToGrades()">
+          <ion-icon src="https://cdn.jsdelivr.net/npm/ionicons@5.5.2/dist/svg/document-text-outline.svg" size="large"></ion-icon>
+          <ion-label>Grades</ion-label>
+        </ion-item>        
+      </div>
+
+      <ion-item button routerLink="/help">
+        <ion-icon src="https://cdn.jsdelivr.net/npm/ionicons@5.5.2/dist/svg/help-circle-outline.svg" size="large"></ion-icon>
+        <ion-label>Help</ion-label>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+
+  <ion-footer>
+    <ion-item button (click)="logout()">
+      <ion-icon src="https://cdn.jsdelivr.net/npm/ionicons@5.5.2/dist/svg/log-out-outline.svg" size="large"></ion-icon>
+      <ion-label>Logout</ion-label>
+    </ion-item>
+  </ion-footer>
+</ion-menu>
+
+<ion-header>
+  <ion-toolbar color="danger">
+    <ion-title>
+      <img src="assets/getThemePhoto.png" alt="School Logo" style="height: 40px;">
+    </ion-title>
+   
+    <ion-buttons slot="start">
+      <ion-menu-toggle>
+        <ion-button>
+          <ion-icon src="https://cdn.jsdelivr.net/npm/ionicons@5.5.2/dist/svg/menu-outline.svg" size="large" style="color: white;"></ion-icon>
+        </ion-button>
+      </ion-menu-toggle>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-avatar>
+        <img src="assets/profile.jpg" alt="User Profile">
+      </ion-avatar>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content id="main-content">
+  <ion-grid>
+    <ion-row>
+      <ion-col size="12">
+        <h2>Welcome back, <strong>Christian</strong></h2>
+        <ion-grid>
+          <ion-row>
+            <ion-col size="3">
+              <ion-button expand="full" color="danger">
+                <ion-icon src="https://cdn.jsdelivr.net/npm/ionicons@5.5.2/dist/svg/school-outline.svg" size="large"></ion-icon>
+                Enrollment
+              </ion-button>
+            </ion-col>
+            <ion-col size="3">
+              <ion-button expand="full" color="primary" (click)="goToGrades()">
+                <ion-icon src="https://cdn.jsdelivr.net/npm/ionicons@5.5.2/dist/svg/document-text-outline.svg" size="large"></ion-icon>
+                Grades
+              </ion-button>
+            </ion-col>
+            <ion-col size="3">
+              <ion-button expand="full" color="success">
+                <ion-icon src="https://cdn.jsdelivr.net/npm/ionicons@5.5.2/dist/svg/cash-outline.svg" size="large"></ion-icon>
+                Assessment
+              </ion-button>
+            </ion-col>
+            <ion-col size="3">
+              <ion-button expand="full" color="warning">
+                <ion-icon src="https://cdn.jsdelivr.net/npm/ionicons@5.5.2/dist/svg/chatbubbles-outline.svg" size="large"></ion-icon>
+                Counseling
+              </ion-button>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col size="3">
+              <ion-button expand="full" color="tertiary">
+                <ion-icon src="https://cdn.jsdelivr.net/npm/ionicons@5.5.2/dist/svg/receipt-outline.svg" size="large"></ion-icon>
+                Request for Report Card
+              </ion-button>
+            </ion-col>
+            <ion-col size="3">
+              <ion-button expand="full" color="medium">
+                <ion-icon src="https://cdn.jsdelivr.net/npm/ionicons@5.5.2/dist/svg/megaphone-outline.svg" size="large"></ion-icon>
+                Announcements
+              </ion-button>
+            </ion-col>
+            <ion-col size="3">
+              <ion-button expand="full" color="danger">
+                <ion-icon src="https://cdn.jsdelivr.net/npm/ionicons@5.5.2/dist/svg/calendar-clear-outline.svg" size="large"></ion-icon>
+                Leave Request
+              </ion-button>
+            </ion-col>
+            <ion-col size="3">
+              <ion-button expand="full" color="dark">
+                <ion-icon src="https://cdn.jsdelivr.net/npm/ionicons@5.5.2/dist/svg/wallet-outline.svg" size="large"></ion-icon>
+                Balance Promissory
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+
+        <ion-card>
+          <ion-card-header color="warning">
+            <ion-card-title>Outstanding Balance: PHP 8,685.00</ion-card-title>
+          </ion-card-header>
+        </ion-card>
+
+        <ion-row>
+          <ion-col size="6">
+            <ion-card>
+              <ion-card-header>
+                <ion-card-title>March 2025</ion-card-title>
+              </ion-card-header>
+              <ion-card-content>
+                <full-calendar [options]="calendarOptions"></full-calendar>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+          
+
+          <ion-col size="6">
+            <ion-card class="notice-card">
+              <ion-card-header class="card-header">
+                <ion-card-title class="card-title">Notice Board</ion-card-title>
+              </ion-card-header>
+            
+              <ion-card-content class="card-content">
+                <div class="icon-container">
+                  <ion-icon name="information-circle" size="large" color="primary"></ion-icon>
+                </div>
+            
+                <p class="notice-text">Currently, there are no new notices.</p>
+            
+                <ion-segment value="notices" class="segment">
+                  <ion-segment-button value="notices">
+                    <ion-label>View All Notices</ion-label>
+                  </ion-segment-button>
+                </ion-segment>
+            
+                <div class="bottom-text">
+                  <p>Stay tuned for more updates!</p>
+                  <ion-button class="refresh-button" expand="block" color="primary" fill="solid">
+                    Refresh
+                  </ion-button>
+                </div>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+        </ion-row>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

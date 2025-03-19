@@ -1,0 +1,304 @@
+/* General Styling */
+ion-content {
+  --background: #f4f4f4;
+  padding: 1rem;
+}
+ion-header {
+  ion-toolbar {
+    height: 50px; // Reduce the height of the toolbar
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
+    
+    ion-title {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      img {
+        height: 30px; // Reduce the logo size
+      }
+    }
+
+    ion-buttons {
+      ion-button {
+        --padding-start: 6px;
+        --padding-end: 6px;
+        --border-radius: 8px;
+        width: 40px; // Smaller button size
+        height: 40px;
+      }
+
+      ion-avatar {
+        width: 35px; // Reduce profile picture size
+        height: 35px;
+        border: 2px solid #fff;
+      }
+    }
+  }
+}
+
+/* Sidebar Menu */
+ion-menu {
+  --width: 260px;
+  --background: #2c3e50;
+  
+  ion-toolbar {
+    --background: #1a252f;
+    ion-title img {
+      max-height: 45px;
+    }
+  }
+
+  ion-item {
+    --color: rgb(0, 0, 0);
+    --ripple-color: rgba(255, 255, 255, 0.2);
+    transition: 0.3s ease-in-out;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateX(5px);
+    }
+
+    ion-icon {
+      color: #f39c12;
+      margin-right: 10px;
+    }
+  }
+}
+
+/* Top Header */
+ion-toolbar {
+  --background: #34495e;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+
+  ion-title img {
+    max-height: 45px;
+  }
+
+  ion-avatar img {
+    border-radius: 50%;
+    border: 2px solid #f39c12;
+  }
+
+  ion-menu-toggle ion-button {
+    ion-icon {
+      color: rgb(0, 0, 0);
+      transition: 0.3s;
+
+      &:hover {
+        transform: scale(1.2);
+        color: #f39c12;
+      }
+    }
+  }
+}
+
+
+/* Buttons */
+ion-button {
+  position: relative;
+  width: 100%;
+  height: 150px;
+  border-radius: 15px;
+  font-size: 1rem;
+  font-weight: bold;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  text-align: center;
+
+  ion-icon {
+    font-size: 2rem;
+    margin-bottom: 5px;
+  }
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  }
+}
+
+// Custom colors for different buttons
+.danger {
+  background: #e63946 !important;
+}
+
+.primary {
+  background: #3a86ff !important;
+}
+
+.success {
+  background: #06d6a0 !important;
+}
+
+.warning {
+  background: #ffbe0b !important;
+}
+
+.tertiary {
+  background: #8338ec !important;
+}
+
+.medium {
+  background: #8d99ae !important;
+}
+
+.dark {
+  background: #3d405b !important;
+}
+
+// Special Notification Button
+.notification-button {
+  width: 130px;
+  height: 250px;
+  background: #5a698e !important;
+  color: white;
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 1.2rem;
+
+  ion-icon {
+    font-size: 3rem;
+  }
+}
+
+/* Cards */
+ion-card {
+  border-radius: 10px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+  transition: 0.3s;
+
+  &:hover {
+    box-shadow: 4px 4px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  ion-card-header {
+    background: #f39c12;
+    color: rgb(0, 0, 0);
+    border-radius: 10px 10px 0 0;
+  }
+
+  ion-card-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+ion-content, ion-menu, ion-button, ion-card {
+  animation: fadeIn 0.5s ease-in-out;
+}
+.notice-card {
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, background-color 0.3s ease;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.notice-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  background-color: #f0f4f8;
+}
+
+/* Header Title Style */
+.card-title {
+  font-size: 1.7rem;
+  text-align: center;
+  font-weight: bold;
+  color: #333;
+  transition: color 0.3s ease;
+}
+
+.card-title:hover {
+  color: #007bff;
+}
+
+/* Icon Styling */
+.icon-container {
+  text-align: center;
+  margin-bottom: 20px;
+  animation: fadeIn 1.2s ease-in-out;
+}
+
+/* Main Notice Text */
+.notice-text {
+  text-align: center;
+  color: #555;
+  font-size: 1.3rem;
+  margin-bottom: 20px;
+  opacity: 0;
+  animation: fadeIn 2s ease-in-out forwards;
+  transition: color 0.3s ease;
+}
+
+.notice-text:hover {
+  color: #ff7f50;
+}
+
+/* Segment Styling */
+.segment {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 1rem;
+}
+
+/* Bottom Text and Button */
+.bottom-text p {
+  text-align: center;
+  color: #888;
+  font-size: 1.1rem;
+  opacity: 0;
+  animation: fadeIn 3s ease-in-out forwards;
+}
+
+/* Button Styling */
+.refresh-button {
+  margin-top: 20px;
+  opacity: 0;
+  animation: fadeIn 4s ease-in-out forwards;
+  transform: scale(1);
+  transition: transform 0.3s ease;
+}
+
+.refresh-button:hover {
+  transform: scale(1.1);
+  background-color: #007bff;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+/* Hover Effect for Segment Button */
+.segment-button:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}

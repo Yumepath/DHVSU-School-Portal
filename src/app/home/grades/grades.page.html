@@ -1,0 +1,44 @@
+<ion-header>
+  <ion-toolbar color="danger">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/dashboard"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Report of Grades</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <!-- Semester Dropdown -->
+  <ion-item>
+    <ion-label>Semester</ion-label>
+    <ion-select [(ngModel)]="selectedSemester" (ionChange)="changeSemester($event)">
+      <ion-select-option value="2024-2025 1st Semester">2024-2025 1st Semester</ion-select-option>
+      <ion-select-option value="2024-2025 2nd Semester">2024-2025 2nd Semester</ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <!-- Grades Table -->
+  <ion-grid class="grades-table">
+    <ion-row class="table-header">
+      <ion-col size="1">#</ion-col>
+      <ion-col size="2">Code</ion-col>
+      <ion-col size="4">Descriptive</ion-col>
+      <ion-col size="1">Units</ion-col>
+      <ion-col size="2">Section</ion-col>
+      <ion-col size="1">Final Avg</ion-col>
+      <ion-col size="1">Remarks</ion-col>
+    </ion-row>
+
+    <ion-row *ngFor="let grade of grades; let i = index" class="table-row">
+      <ion-col size="1">{{ i + 1 }}</ion-col>
+      <ion-col size="2"><strong>{{ grade.code }}</strong></ion-col>
+      <ion-col size="4">{{ grade.descriptive }}</ion-col>
+      <ion-col size="1">{{ grade.units }}</ion-col>
+      <ion-col size="2">{{ grade.section }}</ion-col>
+      <ion-col size="1">
+        <ion-badge [color]="getGradeColor(grade.finalAverage)">{{ grade.finalAverage }}</ion-badge>
+      </ion-col>
+      <ion-col size="1"><ion-text color="success">{{ grade.remarks }}</ion-text></ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

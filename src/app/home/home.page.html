@@ -1,0 +1,52 @@
+<ion-content>
+  <div class="login-container">
+    <div class="login-card">
+      <img src="assets/getThemePhoto.png" alt="University Logo" class="logo">
+      <h2>Login to your account</h2>
+      <ion-item>
+        <ion-icon 
+        src="https://cdn.jsdelivr.net/npm/ionicons@5.5.2/dist/svg/person-outline.svg" 
+        class="custom-icon">
+      </ion-icon>      
+        <ion-input type="text" placeholder="Student ID" id="studentId"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-icon src="https://cdn.jsdelivr.net/npm/ionicons@5.5.2/dist/svg/lock-closed-outline.svg"  class="custom-icon"></ion-icon>
+        <ion-input type="password" placeholder="Password" id="password"></ion-input>
+      </ion-item>
+      <ion-item lines="none">
+        <ion-label>Remember Me</ion-label>
+        <ion-checkbox slot="end"></ion-checkbox>
+      </ion-item>
+      <div class="login-section">
+      <ion-button shape ="round"  expand="full" (click)="redirectToDashboard()">Login</ion-button>
+      </div>
+      <p class="forgot-password">
+        Forgot your password? <a href="#">Click here</a>
+      </p>
+      <div class="register-section">
+        <p>Don't have an account yet?</p>
+        <ion-button expand="full" class="register-button">
+          Create an account (enrolled student, parent)
+        </ion-button>
+        <ion-button expand="full" class="register-button">
+          New Applicant (freshman, transferee)
+        </ion-button>
+      </div>
+      <p class="activate-account">
+        Existing account but not yet <a href="#">Activated?</a>
+      </p>
+      <ion-select placeholder="Choose Language">
+        <ion-select-option value="en">English</ion-select-option>
+        <ion-select-option value="ph">Filipino</ion-select-option>
+      </ion-select>
+      <p class="footer">Made By: Christian Lao Bautista</p>
+    </div>
+  </div>
+
+  <script>
+    function redirectToDashboard() {
+      window.location.href = 'dashboard.html';
+    }
+  </script>
+</ion-content>
