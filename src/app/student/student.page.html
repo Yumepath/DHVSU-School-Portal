@@ -1,0 +1,141 @@
+@if (state.error()) {
+  <div class="notice error" role="alert">{{ state.error() }} <button class="text-button" type="button" (click)="reload()">Refresh records</button></div>
+}
+@if (state.loading()) {
+  <div class="skeleton" role="status" aria-label="Loading student records"><div></div><div></div><div></div></div>
+} @else if (data()) {
+  @switch (view()) {
+    @case ('overview') {
+      <section class="academic-hero">
+        <span class="eyebrow">{{ termLabel() }}</span>
+        <h1>Welcome, {{ profile()?.full_name?.split(' ')?.at(0) }}</h1>
+        <p>{{ program()?.name || 'Student workspace' }}</p>
+        <a class="button hero-action" routerLink="../schedule">View class schedule</a>
+      </section>
+      <div class="section-title"><div><h2>Academic snapshot</h2><p>{{ termLabel() }}</p></div></div>
+      <div class="metrics">
+        <article><span>Subjects</span><strong>{{ activeRecords().length }}</strong><a routerLink="../subjects">View enrolled subjects</a></article>
+        <article><span>Academic units</span><strong>{{ units() }}</strong><span>Current selection</span></article>
+        <article><span>General weighted average</span><strong>{{ (gwa() | number:'1.2-2') ?? '—' }}</strong><a routerLink="../grades">View academic records</a></article>
+        <article><span>Unread notifications</span><strong>{{ unread() }}</strong><a routerLink="../notifications">Open notifications</a></article>
+      </div>
+      <div class="dashboard-grid">
+        <section class="panel">
+          <header><h2>Campus announcements</h2><a routerLink="../announcements">View all</a></header>
+          <app-announcements [entries]="announcements()" [limit]="3" />
+        </section>
+        <section class="panel">
+          <header><h2>Upcoming events</h2><a routerLink="../calendar">Calendar</a></header>
+          <ul class="event-list">
+            @for (event of events().slice(0, 4); track event.id) {
+              <li><time [attr.datetime]="event.starts_on">{{ event.starts_on | date:'MMM d' }}</time><span>{{ event.title }}</span></li>
+            } @empty { <li class="empty">No upcoming events.</li> }
+          </ul>
+        </section>
+      </div>
+    }
+    @case ('profile') {
+      <div class="page-heading"><h1>My profile</h1><p>Your student account and academic program.</p></div>
+      <section class="panel details-panel">
+        <dl>
+          <div><dt>Full name</dt><dd>{{ profile()?.full_name }}</dd></div>
+          <div><dt>Email</dt><dd>{{ profile()?.email }}</dd></div>
+          <div><dt>Student number</dt><dd>{{ schoolProfile()?.student_number || 'Unassigned' }}</dd></div>
+          <div><dt>Program</dt><dd>{{ program()?.name || 'Unassigned' }}</dd></div>
+          <div><dt>Account status</dt><dd><span class="pill active">Active</span></dd></div>
+        </dl>
+      </section>
+    }
+    @case ('notifications') {
+      <div class="page-heading"><h1>Notifications</h1><p>Updates about your academic records.</p></div>
+      <section class="panel">
+        @for (item of notifications(); track item.id) {
+          <article class="notification-row">
+            <div><h2>{{ item.title }}</h2><p>{{ item.body }}</p><time>{{ item.created_at | date:'medium':'+0800' }}</time></div>
+            @if (!item.read_at) {
+              <button class="button subtle" type="button" [disabled]="state.saving()" (click)="markRead(item.id)">Mark as read</button>
+            } @else { <span class="pill">Read</span> }
+          </article>
+        } @empty { <p class="empty">You have no notifications.</p> }
+      </section>
+    }
+    @case ('subjects') {
+      <div class="page-heading"><h1>Enrolled subjects</h1><p>Review subject credits, instructors and enrollment status.</p></div>
+      <section class="panel">
+        <header><h2>Subject load</h2><ng-container [ngTemplateOutlet]="termFilter" /></header>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Code</th><th>Subject</th><th>Section</th><th>Faculty</th><th>Units</th><th>Status</th></tr></thead>
+          <tbody>
+            @for (row of records(); track row.enrollment.id) {
+              <tr><td><strong>{{ row.subject?.code }}</strong></td><td>{{ row.subject?.name }}</td><td>{{ row.section?.name }}</td>
+                <td>{{ row.instructor || '—' }}</td><td>{{ row.subject?.units }}</td><td><span class="pill">{{ row.enrollment.status }}</span></td></tr>
+            } @empty { <tr><td colspan="6" class="empty">No enrollments for this term.</td></tr> }
+          </tbody>
+        </table></div>
+      </section>
+    }
+    @case ('schedule') {
+      <div class="page-heading"><h1>Class schedule</h1><p>Weekly meetings in Philippine time.</p></div>
+      <section class="panel"><header><h2>Weekly timetable</h2><ng-container [ngTemplateOutlet]="termFilter" /></header>
+        <app-schedule [entries]="schedules()" />
+      </section>
+    }
+    @case ('grades') {
+      <div class="page-heading with-actions">
+        <div><h1>Grades &amp; academic history</h1><p>Published results and credit-weighted averages.</p></div>
+        <button type="button" class="button" (click)="print()">Print academic record</button>
+      </div>
+      <p class="print-only">{{ profile()?.full_name }} · {{ schoolProfile()?.student_number }} · {{ program()?.name }} · Unofficial educational portfolio project</p>
+      <section class="panel">
+        <header><h2>{{ termId() ? termLabel() : 'Academic history' }}</h2><ng-container [ngTemplateOutlet]="termFilter" /></header>
+        <div class="metric-summary">General weighted average <strong>{{ (gwa() | number:'1.2-2') ?? '—' }}</strong></div>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Term</th><th>Code</th><th>Subject</th><th>Units</th><th>Grade</th><th>Result</th></tr></thead>
+          <tbody>
+            @for (row of gradeRows(); track row.enrollment.id) {
+              <tr><td>{{ row.term }}</td><td><strong>{{ row.subject?.code }}</strong></td><td>{{ row.subject?.name }}</td>
+                <td>{{ row.subject?.units }}</td><td>{{ row.scale?.label }}</td><td>{{ row.scale?.passing ? 'Passed' : 'Failed' }}</td></tr>
+            } @empty { <tr><td colspan="6" class="empty">No published grades in this selection.</td></tr> }
+          </tbody>
+        </table></div>
+      </section>
+    }
+    @case ('attendance') {
+      <div class="page-heading"><h1>Attendance</h1><p>Attendance recorded by your instructors.</p></div>
+      <section class="panel">
+        <header><h2>Attendance record</h2><ng-container [ngTemplateOutlet]="termFilter" /></header>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Date</th><th>Subject</th><th>Status</th></tr></thead>
+          <tbody>
+            @for (row of attendance(); track row.entry.id) {
+              <tr><td>{{ row.entry.attended_on | date:'MMM d, y' }}</td><td>{{ row.subject }}</td><td><span class="pill">{{ row.entry.status }}</span></td></tr>
+            } @empty { <tr><td colspan="3" class="empty">No attendance recorded for this term.</td></tr> }
+          </tbody>
+        </table></div>
+      </section>
+    }
+    @case ('calendar') {
+      <div class="page-heading"><h1>Academic calendar</h1><p>Campus events and academic deadlines.</p></div>
+      <section class="panel calendar-panel"><app-calendar [events]="data()?.events || []" /></section>
+      <section class="panel calendar-details"><header><h2>Upcoming events</h2></header>
+        <ul class="event-list">
+          @for (event of events(); track event.id) {
+            <li><time>{{ event.starts_on | date:'MMM d' }}</time><div><strong>{{ event.title }}</strong><p class="wrapped">{{ event.description }}</p></div></li>
+          } @empty { <li class="empty">No upcoming events.</li> }
+        </ul>
+      </section>
+    }
+    @case ('announcements') {
+      <div class="page-heading"><h1>Announcements</h1><p>Published notices for your campus and role.</p></div>
+      <section class="panel"><app-announcements [entries]="announcements()" /></section>
+    }
+  }
+}
+<ng-template #termFilter>
+  <label class="inline-field">Semester
+    <select [ngModel]="termId()" (ngModelChange)="termId.set($event)">
+      <option value="">All semesters</option>
+      @for (term of terms(); track term.id) { <option [value]="term.id">{{ termText(term) }}</option> }
+    </select>
+  </label>
+</ng-template>

@@ -1,0 +1,4 @@
+/portal/* /index.html 200
+/sign-in /index.html 200
+/reset-password /index.html 200
+/dashboard /index.html 200

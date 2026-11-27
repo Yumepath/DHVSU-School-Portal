@@ -1,0 +1,58 @@
+<div class="login-layout">
+  <aside class="login-identity">
+    <div class="brand">
+      <img src="assets/getThemePhoto.png" alt="" width="48" height="48">
+      <span>DHVSU <small>School Portal</small></span>
+    </div>
+    <div class="identity-copy">
+      <span class="accent-rule"></span>
+      <p>Don Honorio Ventura State University</p>
+      <h1>DHVSU<br> School Portal</h1>
+      <p class="identity-description">Academic records and campus updates for students, faculty, and administrators.</p>
+    </div>
+    <span class="identity-note">Unofficial educational portfolio project</span>
+  </aside>
+  <main class="login-main">
+    <button class="button subtle theme-switch" type="button" (click)="theme.toggle()">
+      {{ theme.dark() ? 'Light mode' : 'Dark mode' }}
+    </button>
+    <section class="login-form" aria-labelledby="login-title">
+      <h2 id="login-title">{{ resetPage ? 'Set a new password' : forgot() ? 'Reset your password' : 'Sign in' }}</h2>
+      <p class="muted">
+        {{ resetPage ? 'Choose a new password for your portal account.' :
+          forgot() ? 'Enter the email address associated with your account.' : 'Enter your school portal account details.' }}
+      </p>
+      @if (!auth.configured) {
+        <p class="notice" role="status">The portal connection needs to be configured. Follow the setup instructions in the repository README.</p>
+      }
+      @if (resetPage && !auth.recovery()) {
+        <p class="notice" role="status">Open the password reset link from your email in the browser where you requested it.</p>
+      }
+      @if (error()) { <p class="notice error" role="alert">{{ error() }}</p> }
+      @if (message()) { <p class="notice success" role="status">{{ message() }}</p> }
+      <form ngNativeValidate (ngSubmit)="submit()">
+        @if (!resetPage) {
+          <label>Email address
+            <input name="email" [(ngModel)]="email" type="email" autocomplete="username" maxlength="254" required placeholder="you@example.com">
+          </label>
+        }
+        @if (!forgot()) {
+          <label>{{ resetPage ? 'New password' : 'Password' }}
+            <input name="password" [(ngModel)]="password" type="password" [autocomplete]="resetPage ? 'new-password' : 'current-password'"
+              [minlength]="resetPage ? 12 : 1" maxlength="128" required>
+          </label>
+        }
+        <button class="button primary login-submit" type="submit" [disabled]="pending() || !auth.configured || (resetPage && !auth.recovery())">
+          @if (pending()) { <ion-spinner name="crescent" aria-label="Working" /> }
+          @else { {{ resetPage ? 'Update password' : forgot() ? 'Send reset link' : 'Sign in' }} }
+        </button>
+      </form>
+      @if (resetPage) {
+        <a routerLink="/sign-in">Back to sign in</a>
+      } @else {
+        <button class="text-button" type="button" (click)="toggleForgot()">{{ forgot() ? 'Back to sign in' : 'Forgot password?' }}</button>
+      }
+      <p class="login-help">Contact your portal administrator for account access.</p>
+    </section>
+  </main>
+</div>

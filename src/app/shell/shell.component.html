@@ -1,0 +1,53 @@
+@if (auth.profile(); as profile) {
+  <div class="shell" [class.collapsed]="desktopCollapsed()" [class.mobile-open]="mobileOpen()" (keydown.escape)="mobileOpen.set(false)">
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    @if (mobileOpen()) {
+      <button type="button" class="nav-backdrop" aria-label="Close navigation" (click)="mobileOpen.set(false)"></button>
+    }
+    <aside class="side" id="portal-navigation">
+      <a class="brand" [routerLink]="['/portal', profile.role, 'overview']">
+        <img src="assets/getThemePhoto.png" alt="" width="40" height="40">
+        <span>DHVSU <small>School Portal</small></span>
+      </a>
+      <nav aria-label="Portal navigation">
+        @for (group of groups(); track group.label) {
+          <div class="nav-group">
+            <p>{{ group.label }}</p>
+            @for (link of group.links; track link.view) {
+              <a [routerLink]="['/portal', profile.role, link.view]" routerLinkActive="nav-active" ariaCurrentWhenActive="page"
+                [title]="link.label">
+                <ion-icon [name]="link.icon + '-outline'" aria-hidden="true" />
+                <span>{{ link.label }}</span>
+              </a>
+            }
+          </div>
+        }
+      </nav>
+      <div class="side-footer">
+        <small>Unofficial portfolio project</small>
+        <button type="button" class="side-logout" (click)="signOut()" title="Sign out">
+          <ion-icon name="log-out-outline" aria-hidden="true" /><span>Sign out</span>
+        </button>
+      </div>
+    </aside>
+    <div class="workspace">
+      <header class="topbar">
+        <button class="icon-button" type="button" aria-label="Toggle navigation" aria-controls="portal-navigation" (click)="toggleMenu()">
+          <ion-icon name="menu-outline" aria-hidden="true" />
+        </button>
+        <span class="breadcrumb">{{ roleLabel[profile.role] }} <span aria-hidden="true">/</span> <strong>{{ header() }}</strong></span>
+        <div class="topbar-tools">
+          <button class="icon-button" type="button" (click)="theme.toggle()" [attr.aria-label]="theme.dark() ? 'Switch to light mode' : 'Switch to dark mode'">
+            <ion-icon [name]="theme.dark() ? 'sunny-outline' : 'moon-outline'" aria-hidden="true" />
+          </button>
+          <span class="avatar" [title]="profile.full_name">{{ initials() }}</span>
+          <span class="topbar-name">{{ profile.full_name }}</span>
+        </div>
+      </header>
+      <main id="main-content" class="content" tabindex="-1">
+        @if (error()) { <p class="notice error" role="alert">{{ error() }}</p> }
+        <router-outlet />
+      </main>
+    </div>
+  </div>
+}

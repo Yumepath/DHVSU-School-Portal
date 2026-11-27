@@ -1,0 +1,125 @@
+@if (state.error()) {
+  <div class="notice error" role="alert">{{ state.error() }} <button type="button" class="text-button" (click)="reload()">Refresh records</button></div>
+}
+@if (state.loading()) {
+  <div class="skeleton" role="status" aria-label="Loading faculty records"><div></div><div></div><div></div></div>
+} @else if (data()) {
+  @switch (view()) {
+    @case ('overview') {
+      <section class="academic-hero">
+        <span class="eyebrow">Faculty workspace</span>
+        <h1>Welcome, {{ auth.profile()?.full_name?.split(' ')?.at(0) }}</h1>
+        <p>Manage your classes, grade submissions, and attendance.</p>
+        <a class="button hero-action" routerLink="../classes">View assigned classes</a>
+      </section>
+      <div class="section-title"><div><h2>Teaching snapshot</h2><p>Across your assigned classes</p></div></div>
+      <div class="metrics">
+        <article><span>Assigned classes</span><strong>{{ classes().length }}</strong><a routerLink="../classes">Open class masterlist</a></article>
+        <article><span>Students</span><strong>{{ studentCount() }}</strong><span>Unique students</span></article>
+        <article><span>Grades awaiting publication</span><strong>{{ awaitingReview() }}</strong><a routerLink="../grades">Open grade encoding</a></article>
+      </div>
+      <section class="panel"><header><h2>Campus announcements</h2><a routerLink="../announcements">View all</a></header>
+        <app-announcements [entries]="announcements()" [limit]="3" />
+      </section>
+    }
+    @case ('schedule') {
+      <div class="page-heading"><h1>Class schedule</h1><p>Weekly meetings for your assigned classes in Philippine time.</p></div>
+      <section class="panel"><header><h2>Teaching timetable</h2></header><app-schedule [entries]="schedules()" /></section>
+    }
+    @case ('announcements') {
+      <div class="page-heading"><h1>Announcements</h1><p>Published notices for your campus and role.</p></div>
+      <section class="panel"><app-announcements [entries]="announcements()" /></section>
+    }
+    @case ('calendar') {
+      <div class="page-heading"><h1>Academic calendar</h1><p>Campus events and academic deadlines.</p></div>
+      <section class="panel calendar-panel"><app-calendar [events]="data()?.events || []" /></section>
+    }
+    @default {
+      <div class="page-heading">
+        <h1>{{ view() === 'classes' ? 'Assigned classes' : view() === 'grades' ? 'Grade encoding' : 'Attendance' }}</h1>
+        <p>{{ view() === 'classes' ? 'Class masterlists and published performance.' :
+          view() === 'grades' ? 'Save a draft grade, then submit it for administrator review.' : 'Record attendance by class and date.' }}</p>
+      </div>
+      <section class="panel">
+        <header class="with-actions">
+          <h2>{{ selected()?.label || 'Class roster' }}</h2>
+          <div class="control-row">
+            <label class="inline-field">Class
+              <select [ngModel]="classId()" (ngModelChange)="selectClass($event)" [disabled]="state.saving()">
+                @for (item of classes(); track item.assignment.id) {
+                  <option [value]="item.assignment.id">{{ item.label }} · {{ item.termLabel }}</option>
+                } @empty { <option value="">No assigned classes</option> }
+              </select>
+            </label>
+            @if (view() === 'attendance' && selected()) {
+              <label class="inline-field">Meeting date
+                <input type="date" [ngModel]="attendanceDate()" (ngModelChange)="setDate($event)" [min]="selected()?.term?.start_on ?? ''"
+                  [max]="selected()?.term?.end_on ?? ''" [disabled]="state.saving()">
+              </label>
+            }
+          </div>
+        </header>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Student</th><th>Student number</th><th>Enrollment</th>
+            @if (view() !== 'classes') { <th>{{ view() === 'grades' ? 'Grade' : 'Attendance' }}</th><th>Actions</th> }
+          </tr></thead>
+          <tbody>
+            @for (row of roster(); track row.enrollment.id) {
+              <tr>
+                <td><strong>{{ row.name }}</strong></td><td>{{ row.student?.student_number || '—' }}</td><td><span class="pill">{{ row.enrollment.status }}</span></td>
+                @if (view() === 'grades') {
+                  @let draft = gradePicks()[row.enrollment.id] ?? row.grade?.scale_id ?? '';
+                  @let editable = row.enrollment.status !== 'withdrawn' && (!row.grade || row.grade.status === 'draft');
+                  <td>
+                    @if (editable) {
+                      <select [attr.aria-label]="'Grade for ' + row.name" [ngModel]="draft" (ngModelChange)="pickGrade(row.enrollment.id, $event)" [disabled]="state.saving()">
+                        <option value="">Choose grade</option>
+                        @for (option of scale(); track option.id) { <option [value]="option.id">{{ option.label }}</option> }
+                      </select>
+                    } @else { {{ row.scale?.label || '—' }} }
+                  </td>
+                  <td>
+                    <div class="row-actions">
+                      @if (editable) {
+                        <button class="button subtle" type="button" [disabled]="!draft || state.saving()" (click)="saveGrade(row.enrollment.id, draft)">Save draft</button>
+                        @if (row.grade; as grade) {
+                          <button class="button primary" type="button" [disabled]="state.saving() || draft !== grade.scale_id" (click)="submitGrade(grade.id)">Submit</button>
+                        }
+                      } @else if (row.grade) { <span class="pill">{{ row.grade.status }}</span> }
+                    </div>
+                  </td>
+                }
+                @if (view() === 'attendance') {
+                  @let attendance = attendancePicks()[row.enrollment.id] ?? row.attendance?.status;
+                  <td>
+                    @if (row.enrollment.status === 'enrolled') {
+                      <select [attr.aria-label]="'Attendance for ' + row.name" [ngModel]="attendance || ''"
+                        (ngModelChange)="pickAttendance(row.enrollment.id, $event)" [disabled]="state.saving()">
+                        <option value="">Choose status</option>
+                        @for (status of statuses; track status) { <option [value]="status">{{ status }}</option> }
+                      </select>
+                    } @else { <span class="pill">{{ attendance || '—' }}</span> }
+                  </td>
+                  <td>
+                    @if (row.enrollment.status === 'enrolled' && attendance) {
+                      <button type="button" class="button subtle" [disabled]="state.saving() || !attendanceDate()"
+                        (click)="saveAttendance(row.enrollment.id, attendance)">Save attendance</button>
+                    }
+                  </td>
+                }
+              </tr>
+            } @empty { <tr><td [attr.colspan]="view() === 'classes' ? 3 : 5" class="empty">No students in this class roster.</td></tr> }
+          </tbody>
+        </table></div>
+      </section>
+      @if (view() === 'classes' && selected()) {
+        <div class="section-title"><div><h2>Class performance</h2><p>Published grades for {{ selected()?.label }}</p></div></div>
+        <div class="metrics">
+          <article><span>Published grades</span><strong>{{ results().published }}</strong></article>
+          <article><span>Passing grades</span><strong>{{ results().passing }}</strong></article>
+          <article><span>Class mean</span><strong>{{ (results().mean | number:'1.2-2') ?? '—' }}</strong></article>
+        </div>
+      }
+    }
+  }
+}
