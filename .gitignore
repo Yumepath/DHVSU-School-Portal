@@ -68,3 +68,12 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+.env
+.env.*
+!.env.example
+/src/environments/supabase.generated.ts
+/supabase/.branches/
+/supabase/.temp/
+/playwright-report/
+/test-results/

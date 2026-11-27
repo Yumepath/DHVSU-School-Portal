@@ -1,0 +1,172 @@
+@if (state.error()) {
+  <div class="notice error" role="alert">{{ state.error() }} <button type="button" class="text-button" (click)="reload()">Refresh records</button></div>
+}
+@if (state.loading()) {
+  <div class="skeleton" role="status" aria-label="Loading administrative records"><div></div><div></div><div></div></div>
+} @else if (view() === 'overview') {
+  <section class="academic-hero">
+    <span class="eyebrow">Registrar workspace</span>
+    <h1>Administration overview</h1>
+    <p>Manage academic operations and account access.</p>
+    <a class="button hero-action" routerLink="../enrollments">Manage enrollments</a>
+  </section>
+  <div class="section-title"><div><h2>Campus at a glance</h2><p>Counts across all academic terms</p></div></div>
+  <div class="metrics">
+    <article><span>Active students</span><strong>{{ summary().students }}</strong><a routerLink="../students">Student directory</a></article>
+    <article><span>Active faculty</span><strong>{{ summary().faculty }}</strong><a routerLink="../faculty">Faculty directory</a></article>
+    <article><span>Assigned classes</span><strong>{{ summary().classes }}</strong><a routerLink="../class_assignments">Class assignments</a></article>
+    <article><span>Active enrollments</span><strong>{{ summary().enrolled }}</strong><a routerLink="../enrollments">Enrollment records</a></article>
+  </div>
+  <div class="dashboard-grid">
+    <section class="panel">
+      <header><h2>Grade workflow</h2><a routerLink="../grades">Manage grades</a></header>
+      <div class="chart">
+        <p class="muted">Distribution by review status</p>
+        @for (item of summary().grades; track item.status) {
+          <div><span>{{ item.status }}</span><progress [attr.aria-label]="item.status + ' grades'" [value]="item.count" [max]="gradeTotal() || 1"></progress><strong>{{ item.count }}</strong></div>
+        }
+      </div>
+    </section>
+    <section class="panel">
+      <header><h2>Recent activity</h2><a routerLink="../audit_logs">Audit log</a></header>
+      <ul class="event-list">
+        @for (entry of summary().activity; track entry.id) {
+          <li><span class="pill">{{ entry['action'] }}</span><span>{{ entry['entity'] }}</span></li>
+        } @empty { <li class="empty">No administrative changes have been recorded.</li> }
+      </ul>
+    </section>
+  </div>
+} @else { @if (config(); as table) {
+  <div class="page-heading with-actions">
+    <div><h1>{{ title() }}</h1><p>{{ table.description }}</p></div>
+    <div class="row-actions">
+      <button class="button subtle" type="button" [disabled]="!filtered().length" (click)="exportCsv()">Export CSV</button>
+      @if (view() === 'profiles') {
+        <button class="button primary" type="button" (click)="open(null, 'account')">Provision account</button>
+      } @else if (table.create !== false && !table.readOnly) {
+        <button class="button primary" type="button" (click)="open(null)">Add record</button>
+      }
+    </div>
+  </div>
+  <section class="panel admin-list">
+    <header class="control-row">
+      <label class="inline-field">Search
+        <input type="search" [ngModel]="query()" (ngModelChange)="query.set($event); page.set(1)" placeholder="Search records">
+      </label>
+      @if (statusColumn(); as column) {
+        <label class="inline-field">{{ column.label }}
+          <select [ngModel]="statusFilter()" (ngModelChange)="statusFilter.set($event); page.set(1)">
+            <option value="">All values</option>
+            @for (value of filterOptions(); track value) { <option [value]="value">{{ value }}</option> }
+          </select>
+        </label>
+      }
+    </header>
+    <div class="table-scroll"><table>
+      <thead><tr>
+        @for (column of columns(); track column.key) {
+          <th [attr.aria-sort]="sort()?.key === column.key ? (sort()?.ascending ? 'ascending' : 'descending') : null">
+            <button class="sort-button" type="button" (click)="setSort(column.key)">
+              {{ column.label }} @if (sort()?.key === column.key) { <span aria-hidden="true">{{ sort()?.ascending ? '↑' : '↓' }}</span> }
+            </button>
+          </th>
+        }
+        @if (!table.readOnly) { <th>Actions</th> }
+      </tr></thead>
+      <tbody>
+        @for (row of pageRows(); track row.id) {
+          <tr>
+            @for (column of columns(); track column.key) {
+              <td [class.truncate-cell]="column.type === 'textarea'" [title]="column.type === 'textarea' ? cell(row, column) : ''">{{ cell(row, column) }}</td>
+            }
+            @if (!table.readOnly) {
+              <td><div class="row-actions">
+                @if (view() === 'grades' && row['status'] === 'submitted') {
+                  <button class="button primary" type="button" [disabled]="state.saving()" (click)="changeGrade(row, 'published')">Publish</button>
+                }
+                @if (view() === 'grades' && row['status'] === 'draft') {
+                  <button class="button subtle" type="button" [disabled]="state.saving()" (click)="changeGrade(row, 'submitted')">Submit</button>
+                }
+                @if (view() === 'grades' && row['status'] !== 'draft') {
+                  <button class="button subtle" type="button" [disabled]="state.saving()" (click)="changeGrade(row, 'draft')">Return to draft</button>
+                }
+                <button class="button subtle" type="button" [disabled]="state.saving()" (click)="open(row)">Edit</button>
+                @if (table.delete !== false) {
+                  <button class="button subtle danger" type="button" [disabled]="state.saving()" (click)="open(row, 'delete')">Delete</button>
+                }
+              </div></td>
+            }
+          </tr>
+        } @empty { <tr><td class="empty" [attr.colspan]="columns().length + (table.readOnly ? 0 : 1)">No matching records.</td></tr> }
+      </tbody>
+    </table></div>
+    <footer class="pagination">
+      <span aria-live="polite">{{ filtered().length }} records · Page {{ page() }} of {{ pageCount() }}</span>
+      <div class="control-row">
+        <label class="inline-field">Rows
+          <select [ngModel]="pageSize()" (ngModelChange)="pageSize.set($event); page.set(1)">
+            <option [ngValue]="10">10</option><option [ngValue]="25">25</option><option [ngValue]="50">50</option>
+          </select>
+        </label>
+        <button class="button subtle" type="button" [disabled]="page() <= 1" (click)="page.set(page() - 1)">Previous</button>
+        <button class="button subtle" type="button" [disabled]="page() >= pageCount()" (click)="page.set(page() + 1)">Next</button>
+      </div>
+    </footer>
+  </section>
+}
+}
+<dialog #editor (cancel)="state.saving() ? $event.preventDefault() : null" aria-labelledby="editor-title">
+  <form class="dialog-form" ngNativeValidate (ngSubmit)="save()">
+    <h2 id="editor-title">{{ mode() === 'delete' ? 'Delete record' : mode() === 'account' ? 'Provision account' : editing() ? 'Edit record' : 'Add record' }}</h2>
+    @if (state.error()) { <p class="notice error" role="alert">{{ state.error() }}</p> }
+    @if (mode() === 'delete') {
+      <p>Delete this record from {{ title().toLowerCase() }}? Records that link to it must be addressed first.</p>
+    } @else if (mode() === 'account') {
+      <label>Full name <input required name="name" maxlength="120" minlength="2" [(ngModel)]="account.full_name"></label>
+      <label>Email address <input required name="email" type="email" maxlength="254" [(ngModel)]="account.email"></label>
+      <label>Role
+        <select name="role" [(ngModel)]="account.role">
+          <option value="student">Student</option><option value="faculty">Faculty</option><option value="admin">Administrator</option>
+        </select>
+      </label>
+      <label>Initial password <input required type="password" name="password" minlength="12" maxlength="72" autocomplete="new-password" [(ngModel)]="account.password"></label>
+    } @else {
+      @for (field of fields(); track field.key) {
+        <label [class.checkbox-field]="field.type === 'boolean'">
+          {{ field.label }}
+          @switch (field.type) {
+            @case ('select') {
+              <select [(ngModel)]="model[field.key]" [name]="field.key" [required]="!!field.required">
+                <option value="">{{ field.key === 'audience' ? 'Everyone' : 'Select ' + field.label.toLowerCase() }}</option>
+                @for (choice of choices(field); track choice.id) { <option [value]="choice.id">{{ choice.title }}</option> }
+              </select>
+            }
+            @case ('textarea') {
+              <textarea [(ngModel)]="model[field.key]" [name]="field.key" [required]="!!field.required" [maxLength]="field.key === 'body' ? 8000 : 2000"></textarea>
+            }
+            @case ('boolean') {
+              <input type="checkbox" [(ngModel)]="model[field.key]" [name]="field.key"
+                [disabled]="field.key === 'active' && editing()?.id === auth.profile()?.id">
+            }
+            @case ('number') {
+              <input type="number" [(ngModel)]="model[field.key]" [name]="field.key" [step]="field.step || '1'" [required]="!!field.required">
+            }
+            @default {
+              <input [(ngModel)]="model[field.key]" [name]="field.key" [type]="field.type || 'text'" maxlength="160" [required]="!!field.required">
+            }
+          }
+        </label>
+        @if (field.key === 'published_at') {
+          <div class="row-actions"><button class="button subtle" type="button" (click)="setPublishNow()">Publish now</button>
+            <button class="button subtle" type="button" (click)="model['published_at'] = ''">Keep as draft</button></div>
+        }
+      }
+    }
+    <div class="dialog-actions">
+      <button class="button subtle" type="button" [disabled]="state.saving()" (click)="close()">Cancel</button>
+      <button class="button primary" type="submit" [disabled]="state.saving()">
+        {{ state.saving() ? 'Saving…' : mode() === 'delete' ? 'Delete record' : mode() === 'account' ? 'Create account' : 'Save record' }}
+      </button>
+    </div>
+  </form>
+</dialog>
